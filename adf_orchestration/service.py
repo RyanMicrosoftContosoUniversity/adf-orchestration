@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any
 
 from azure.identity import ClientSecretCredential
 from azure.mgmt.datafactory import DataFactoryManagementClient
@@ -43,3 +43,63 @@ class ADFService:
             parameters=parameters or {},
         )
         return run_response.run_id
+
+    def get_pipeline_run_status(self, run_id: str) -> Dict[str, Any]:
+        """Get the status of a pipeline run.
+
+        Args:
+            run_id: The run ID returned by trigger_pipeline.
+
+        Returns:
+            Dictionary containing status information about the pipeline run.
+        """
+        run_response = self.client.pipeline_runs.get(
+            resource_group_name=self.resource_group,
+            factory_name=self.factory_name,
+            run_id=run_id,
+        )
+        return {
+            "run_id": run_response.run_id,
+            "pipeline_name": run_response.pipeline_name,
+            "status": run_response.status,
+            "start_time": run_response.run_start,
+            "end_time": run_response.run_end,
+            "duration_in_ms": run_response.run_duration or 0,
+            "parameters": run_response.parameters,
+        }
+
+    def list_pipelines(self) -> List[Dict[str, Any]]:
+        """List all pipelines in the Azure Data Factory.
+
+        Returns:
+            List of dictionaries containing pipeline information.
+        """
+        pipelines = self.client.pipelines.list_by_factory(
+            resource_group_name=self.resource_group,
+            factory_name=self.factory_name,
+        )
+
+        result = []
+        for pipeline in pipelines:
+            result.append(
+                {
+                    "id": pipeline.id,
+                    "name": pipeline.name,
+                    "type": pipeline.type,
+                    "description": pipeline.description,
+                    "folder_name": pipeline.folder.name if pipeline.folder else None,
+                }
+            )
+        return result
+
+    def cancel_pipeline_run(self, run_id: str) -> None:
+        """Cancel a pipeline run.
+
+        Args:
+            run_id: The run ID of the pipeline run to cancel.
+        """
+        self.client.pipeline_runs.cancel(
+            resource_group_name=self.resource_group,
+            factory_name=self.factory_name,
+            run_id=run_id,
+        )
