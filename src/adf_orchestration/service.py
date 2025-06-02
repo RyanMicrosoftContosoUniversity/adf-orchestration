@@ -3,19 +3,23 @@ from typing import Optional, Dict, List, Any
 
 from azure.identity import ClientSecretCredential
 from azure.mgmt.datafactory import DataFactoryManagementClient
+from azure.identity import DefaultAzureCredential
 
 
 class ADFService:
     """Service for interacting with Azure Data Factory."""
 
     def __init__(self) -> None:
-        self.subscription_id = os.environ["SUBSCRIPTION_ID"]
-        self.resource_group = os.environ["RESOURCE_GROUP"]
-        self.factory_name = os.environ["FACTORY_NAME"]
+        try:
+            self.subscription_id = os.environ["SUBSCRIPTION_ID"]
+            self.resource_group = os.environ["RESOURCE_GROUP"]
+            self.factory_name = os.environ["FACTORY_NAME"]
 
-        tenant_id = os.environ["AZURE_TENANT_ID"]
-        client_id = os.environ["AZURE_CLIENT_ID"]
-        client_secret = os.environ["AZURE_CLIENT_SECRET"]
+            tenant_id = os.environ["AZURE_TENANT_ID"]
+            client_id = os.environ["AZURE_CLIENT_ID"]
+            client_secret = os.environ["AZURE_CLIENT_SECRET"]
+        except KeyError as e:
+            raise EnvironmentError(f"Missing required environment variable: {e}")
 
         credential = ClientSecretCredential(
             tenant_id=tenant_id,
@@ -23,7 +27,7 @@ class ADFService:
             client_secret=client_secret,
         )
 
-        self.client = DataFactoryManagementClient(credential, self.subscription_id)
+        self.client = DataFactoryManagementClient(DefaultAzureCredential(), self.subscription_id)
 
     def trigger_pipeline(self, pipeline_name: str, parameters: Optional[Dict[str, str]] = None) -> str:
         """Trigger an existing Azure Data Factory pipeline.
@@ -35,15 +39,16 @@ class ADFService:
         Returns:
             The run ID of the triggered pipeline run.
         """
-
-        run_response = self.client.pipelines.create_run(
-            resource_group_name=self.resource_group,
-            factory_name=self.factory_name,
-            pipeline_name=pipeline_name,
-            parameters=parameters or {},
-        )
-        return run_response.run_id
-
+        try:
+            run_response = self.client.pipelines.create_run(
+                resource_group_name=self.resource_group,
+                factory_name=self.factory_name,
+                pipeline_name=pipeline_name,
+                parameters=parameters or {},
+            )
+            return run_response.run_id
+        except Exception as e:
+            print(f"Error triggering pipeline '{pipeline_name}': {e}")
     def get_pipeline_run_status(self, run_id: str) -> Dict[str, Any]:
         """Get the status of a pipeline run.
 

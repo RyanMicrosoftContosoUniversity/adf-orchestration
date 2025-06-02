@@ -17,7 +17,7 @@ class DummyCredential:
 azure_identity_stub.ClientSecretCredential = DummyCredential
 sys.modules.setdefault("azure.identity", azure_identity_stub)
 
-from src.adf_orchestration import ADFService
+from adf_orchestration import ADFService
 
 
 class DummyPipelineRuns:
@@ -54,7 +54,7 @@ def test_service_initialization(monkeypatch):
         return dummy_client
 
     monkeypatch.setattr(
-        "src.adf_orchestration.service.DataFactoryManagementClient", dummy_client_factory
+        "adf_orchestration.service.DataFactoryManagementClient", dummy_client_factory
     )
 
     service = ADFService()
@@ -80,7 +80,7 @@ def test_trigger_pipeline(monkeypatch):
         return dummy_client
 
     monkeypatch.setattr(
-        "src.adf_orchestration.service.DataFactoryManagementClient", dummy_client_factory
+        "adf_orchestration.service.DataFactoryManagementClient", dummy_client_factory
     )
 
     service = ADFService()

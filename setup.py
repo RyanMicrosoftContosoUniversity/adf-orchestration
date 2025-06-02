@@ -5,31 +5,27 @@ with open(file="README.md", mode="r") as fh:
     long_description = fh.read()
 
 setup(
-    name='adf_orchestration',
-    version='0.1.0',
+    name="adf_orchestration",
+    version="0.1.0",
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     install_requires=[
-        'azure-mgmt-datafactory',
-        'azure-identity',
-        'pytest'
-        
+        "azure-identity>=1.12.0",
+        "azure-mgmt-datafactory>=9.1.0",
+        "python-dotenv>=1.0.0",
     ],
-    packages=find_packages(where='src'),
-    package_dir={'': 'src'},
-    entry_points={
-        'console_scripts': [
-            # Define command-line scripts here, e.g.,
-            # 'metadata-scan=scripts.metadata_scan:main',
-        ],
+    extras_require={
+        "dev": ["pytest>=7.0.0"],
     },
-    include_package_data=True,
-    description='A framework for orchestrating azure data factory pipelines',
-    author='RH',
-    author_email='RH@gmail.com',
-    url='https://github.com/RyanMicrosoftContosoUniversity/adf-orchestration',
+    python_requires=">=3.8",
+    description="A library for Azure Data Factory orchestration",
+    author="Your Name",
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
-    python_requires='>=3.8',
 )

@@ -19,8 +19,17 @@ Environment variables required:
 
 import sys
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Add the src directory to Python path
+repo_root = Path(__file__).parent.parent
+sys.path.insert(0, str(repo_root / "src"))
+
+# Now import from the correct location
 from adf_orchestration.service import ADFService
 
+load_dotenv()
 
 def parse_parameters(param_strings):
     """Parse command-line parameters into a dictionary.
@@ -48,6 +57,18 @@ def main():
         "AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET"
     ]
     
+    # try loading env variables locally as if not from cmd if run locally
+    try:
+        SUBSCRIPTION_ID = os.environ['SUBSCRIPTION_ID']
+        RESOURCE_GROUP = os.environ['RESOURCE_GROUP']
+        FACTORY_NAME = os.environ['FACTORY_NAME']
+        AZURE_TENANT_ID = os.environ['AZURE_TENANT_ID']
+        AZURE_CLIENT_ID = os.environ['AZURE_CLIENT_ID']
+        AZURE_CLIENT_SECRET = os.environ['AZURE_CLIENT_SECRET']
+
+    except:
+        print('Failed to load env vars')
+
     missing_vars = [var for var in required_env_vars if var not in os.environ]
     if missing_vars:
         print(f"Error: Missing required environment variables: {', '.join(missing_vars)}")

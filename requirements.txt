@@ -1,4 +1,4 @@
-azure-mgmt-datafactory
-azure-identity
-pytest
-
+azure-mgmt-datafactory==9.2.0
+azure-identity==1.23.0
+pytest==8.3.5
+python-dotenv==1.0.0
