@@ -14,7 +14,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/scripts/client.py",
             "console": "integratedTerminal",
-            "args": ["run", "plCopyData", "file=SalesLTCustomer.csv", "sourcePath=wwi"]
+            "args": ["run", "plCopyData", "file=SalesLTProduct.csv", "sourcePath=wwi"]
         }
     ]
 }
